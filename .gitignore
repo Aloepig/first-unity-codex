@@ -1,0 +1,46 @@
+# Unity generated folders
+[Ll]ibrary/
+[Tt]emp/
+[Oo]bj/
+[Bb]uild/
+[Bb]uilds/
+[Ll]ogs/
+[Uu]ser[Ss]ettings/
+[Mm]emoryCaptures/
+[Rr]ecordings/
+
+# Addressables / generated runtime data
+Assets/AddressableAssetsData/*/*.bin*
+Assets/AddressableAssetsData/*/*.json
+Assets/StreamingAssets/aa.meta
+Assets/StreamingAssets/aa/
+
+# Visual Studio / Rider
+.vs/
+.idea/
+.vscode/
+*.csproj
+*.unityproj
+*.sln
+*.suo
+*.tmp
+*.user
+*.userprefs
+*.pidb
+*.booproj
+*.svd
+*.pdb
+*.mdb
+*.opendb
+*.VC.db
+
+# OS files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Keep these tracked:
+#! Assets/
+#! Packages/manifest.json
+#! Packages/packages-lock.json
+#! ProjectSettings/
