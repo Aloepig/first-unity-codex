@@ -8,11 +8,11 @@ namespace Script
         [Header("Movement")] [SerializeField] private float moveSpeed = 6f;
         [SerializeField] private InputActionReference moveAction;
 
-        [Header("Coin Toss Settings")]
-        [SerializeField] private GameObject coinPrefab;
+        [Header("Coin Toss Settings")] [SerializeField]
+        private GameObject coinPrefab;
         [SerializeField] private Transform tossPoint;
         [SerializeField] private Vector2 tossForce = new Vector2(3f, 5f);
-        
+
         [Header("Inventory Coin")] [SerializeField]
         private int coinCount = 10;
 
@@ -39,7 +39,7 @@ namespace Script
         private void Update()
         {
             horizontal = moveInput != null ? moveInput.ReadValue<Vector2>().x : 0f;
-            
+
             if (Keyboard.current != null && Keyboard.current.gKey.wasPressedThisFrame && coinCount > 0)
             {
                 TossCoin();
@@ -55,7 +55,7 @@ namespace Script
 
             rb.linearVelocity = new Vector2(horizontal * moveSpeed, rb.linearVelocity.y);
         }
-        
+
         private void TossCoin()
         {
             if (coinPrefab == null)
@@ -81,5 +81,33 @@ namespace Script
             coinRb.AddForce(finalForce, ForceMode2D.Impulse);
         }
 
+
+        public void HandleCoinTrigger(Collider2D collision)
+        {
+            if (collision.CompareTag("Coin"))
+            {
+                Coin coin = collision.GetComponent<Coin>();
+                if (coin != null)
+                {
+                    coin.AttractTo(transform);
+                }
+            }
+        }
+
+        private void OnTriggerEnter2D(Collider2D collision)
+        {
+            // Keep support when trigger collider exists on the same object as PlayerController.
+            HandleCoinTrigger(collision);
+        }
+
+        private void OnCollisionEnter2D(Collision2D collision)
+        {
+            if (collision.gameObject.CompareTag("Coin"))
+            {
+                Destroy(collision.gameObject);
+                coinCount++;
+                Debug.Log($"Coin picked up. Current coins: {coinCount}");
+            }
+        }
     }
 }
