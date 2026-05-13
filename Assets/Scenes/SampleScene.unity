@@ -1120,6 +1120,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Player
       objectReference: {fileID: 0}
+    - target: {fileID: 6088858994765239897, guid: 0467db3d613c71e4288b6c7a81b7153a, type: 3}
+      propertyPath: coinPrefab
+      value: 
+      objectReference: {fileID: 0}
     - target: {fileID: 8169445957427217733, guid: 0467db3d613c71e4288b6c7a81b7153a, type: 3}
       propertyPath: m_LocalPosition.x
       value: -5.196
