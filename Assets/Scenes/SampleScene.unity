@@ -300,6 +300,7 @@ GameObject:
   m_Component:
   - component: {fileID: 619172986}
   - component: {fileID: 619172985}
+  - component: {fileID: 619172989}
   - component: {fileID: 619172984}
   - component: {fileID: 619172988}
   - component: {fileID: 619172987}
@@ -477,6 +478,24 @@ BoxCollider2D:
   m_AutoTiling: 0
   m_Size: {x: 1, y: 2}
   m_EdgeRadius: 0
+--- !u!114 &619172989
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 619172983}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6ab10700986cefc4fa25c3063fb580f3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Script.GroupSpriteAnimator
+  idleSprite: {fileID: 8793639957104055765, guid: 4f2936c0016d57644b04294e80f2984b, type: 3}
+  walkSprite1: {fileID: 8681008312180965034, guid: 98fae7c268a589443a7b61e04dd5ed64, type: 3}
+  walkSprite2: {fileID: 2863959778521798171, guid: a2d662c8d7a2ac84db2287bd78e592e9, type: 3}
+  walkFps: 6
+  moveThreshold: 0.05
+  targetRigidbody: {fileID: 0}
 --- !u!1 &619394800
 GameObject:
   m_ObjectHideFlags: 0
