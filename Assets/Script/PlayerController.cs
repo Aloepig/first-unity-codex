@@ -12,6 +12,7 @@ namespace Script
         private GameObject coinPrefab;
         [SerializeField] private Transform tossPoint;
         [SerializeField] private Vector2 tossForce = new Vector2(3f, 5f);
+        [SerializeField] private float coinPickupDelayAfterThrow = 0.35f;
 
         [Header("Inventory Coin")] [SerializeField]
         private int coinCount = 10;
@@ -75,6 +76,12 @@ namespace Script
                 return;
             }
 
+            Coin coin = newCoin.GetComponent<Coin>();
+            if (coin != null)
+            {
+                coin.InitializeAfterThrow(coinPickupDelayAfterThrow);
+            }
+
             float lookDirection = transform.localScale.x;
             Vector2 finalForce = new Vector2(tossForce.x * lookDirection, tossForce.y);
 
@@ -104,6 +111,12 @@ namespace Script
         {
             if (collision.gameObject.CompareTag("Coin"))
             {
+                Coin coin = collision.gameObject.GetComponent<Coin>();
+                if (coin != null && !coin.CanBeCollected())
+                {
+                    return;
+                }
+
                 Destroy(collision.gameObject);
                 coinCount++;
                 Debug.Log($"Coin picked up. Current coins: {coinCount}");
