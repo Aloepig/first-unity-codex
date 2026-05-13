@@ -68,6 +68,11 @@ namespace Script
             coinCount--;
 
             Vector3 spawnPosition = tossPoint != null ? tossPoint.position : transform.position;
+            if (tossPoint == null || tossPoint == transform)
+            {
+                float lookDirection = transform.localScale.x >= 0f ? 1f : -1f;
+                spawnPosition += new Vector3(lookDirection * 0.8f, 0.2f, 0f);
+            }
             GameObject newCoin = Instantiate(coinPrefab, spawnPosition, Quaternion.identity);
             Rigidbody2D coinRb = newCoin.GetComponent<Rigidbody2D>();
             if (coinRb == null)
@@ -82,7 +87,7 @@ namespace Script
                 coin.InitializeAfterThrow(coinPickupDelayAfterThrow);
             }
 
-            float lookDirection = transform.localScale.x;
+            float lookDirection = transform.localScale.x >= 0f ? 1f : -1f;
             Vector2 finalForce = new Vector2(tossForce.x * lookDirection, tossForce.y);
 
             coinRb.AddForce(finalForce, ForceMode2D.Impulse);

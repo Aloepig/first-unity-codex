@@ -1,49 +1,140 @@
 using UnityEditor;
 using UnityEditor.Animations;
 using UnityEngine;
+using System.IO;
 
-public static class CreateBottomBigEarsAnimator
+public static class CreateCharacterAnimatorFromFolder
 {
-    private const string BasePath = "Assets/Art/GeneratedCharacters/single_sources/bottom_big_ears";
-    private const string IdlePath = BasePath + "/idle.png";
-    private const string Walk1Path = BasePath + "/walk_1.png";
-    private const string Walk2Path = BasePath + "/walk_2.png";
-
-    private const string OutputDir = BasePath + "/Animator";
-    private const string IdleClipPath = OutputDir + "/bottom_big_ears_idle.anim";
-    private const string WalkClipPath = OutputDir + "/bottom_big_ears_walk.anim";
-    private const string ControllerPath = OutputDir + "/bottom_big_ears.controller";
-
-    [MenuItem("Tools/Animation/Create Bottom Big Ears Animator")]
-    public static void CreateAnimatorAssets()
+    [MenuItem("Assets/Animation/Create Character Animator From Folder", true)]
+    private static bool ValidateCreateAnimatorAssetsFromSelection()
     {
-        EnsureTextureSettings(IdlePath);
-        EnsureTextureSettings(Walk1Path);
-        EnsureTextureSettings(Walk2Path);
+        string folder = GetSelectedFolderPath();
+        return !string.IsNullOrEmpty(folder) && folder.StartsWith("Assets/Art/");
+    }
 
-        Sprite idle = AssetDatabase.LoadAssetAtPath<Sprite>(IdlePath);
-        Sprite walk1 = AssetDatabase.LoadAssetAtPath<Sprite>(Walk1Path);
-        Sprite walk2 = AssetDatabase.LoadAssetAtPath<Sprite>(Walk2Path);
-
-        if (idle == null || walk1 == null || walk2 == null)
+    [MenuItem("Assets/Animation/Create Character Animator From Folder")]
+    private static void CreateAnimatorAssetsFromSelection()
+    {
+        string basePath = GetSelectedFolderPath();
+        if (string.IsNullOrEmpty(basePath))
         {
-            Debug.LogError("Sprite load failed. Check idle.png, walk_1.png, walk_2.png in bottom_big_ears folder.");
+            Debug.LogError("Select a character folder under Assets/Art first.");
             return;
         }
 
-        if (!AssetDatabase.IsValidFolder(OutputDir))
+        CreateAnimatorAssets(basePath);
+    }
+
+    [MenuItem("Tools/Animation/Create Character Animator (Selected Art Folder)")]
+    private static void CreateAnimatorAssetsFromToolsMenu()
+    {
+        string basePath = GetSelectedFolderPath();
+        if (string.IsNullOrEmpty(basePath))
         {
-            AssetDatabase.CreateFolder(BasePath, "Animator");
+            basePath = PromptFolderUnderAssetsArt();
+            if (string.IsNullOrEmpty(basePath))
+            {
+                Debug.LogError("Select a character folder under Assets/Art first.");
+                return;
+            }
         }
 
-        AnimationClip idleClip = CreateIdleClip(idle, IdleClipPath);
-        AnimationClip walkClip = CreateWalkClip(walk1, walk2, WalkClipPath);
-        AnimatorController controller = CreateController(idleClip, walkClip, ControllerPath);
+        CreateAnimatorAssets(basePath);
+    }
+
+    private static void CreateAnimatorAssets(string basePath)
+    {
+        string idlePath = $"{basePath}/idle.png";
+        string walk1Path = $"{basePath}/walk_1.png";
+        string walk2Path = $"{basePath}/walk_2.png";
+
+        string outputDir = $"{basePath}/Animator";
+        string characterName = Path.GetFileName(basePath);
+        string idleClipPath = $"{outputDir}/{characterName}_idle.anim";
+        string walkClipPath = $"{outputDir}/{characterName}_walk.anim";
+        string controllerPath = $"{outputDir}/{characterName}.controller";
+
+        EnsureTextureSettings(idlePath);
+        EnsureTextureSettings(walk1Path);
+        EnsureTextureSettings(walk2Path);
+
+        Sprite idle = AssetDatabase.LoadAssetAtPath<Sprite>(idlePath);
+        Sprite walk1 = AssetDatabase.LoadAssetAtPath<Sprite>(walk1Path);
+        Sprite walk2 = AssetDatabase.LoadAssetAtPath<Sprite>(walk2Path);
+
+        if (idle == null || walk1 == null || walk2 == null)
+        {
+            Debug.LogError($"Sprite load failed in {basePath}. Required files: idle.png, walk_1.png, walk_2.png");
+            return;
+        }
+
+        if (!AssetDatabase.IsValidFolder(outputDir))
+        {
+            AssetDatabase.CreateFolder(basePath, "Animator");
+        }
+
+        AnimationClip idleClip = CreateIdleClip(idle, idleClipPath);
+        AnimationClip walkClip = CreateWalkClip(walk1, walk2, walkClipPath);
+        AnimatorController controller = CreateController(idleClip, walkClip, controllerPath);
 
         AssetDatabase.SaveAssets();
         AssetDatabase.Refresh();
 
-        Debug.Log($"Created Animator assets: {controller.name}");
+        Debug.Log($"Created Animator assets for '{characterName}' at {outputDir}");
+    }
+
+    private static string GetSelectedFolderPath()
+    {
+        Object selected = Selection.activeObject;
+        if (selected == null)
+        {
+            return null;
+        }
+
+        string path = AssetDatabase.GetAssetPath(selected);
+        if (string.IsNullOrEmpty(path))
+        {
+            return null;
+        }
+
+        if (AssetDatabase.IsValidFolder(path))
+        {
+            return path;
+        }
+
+        string directory = Path.GetDirectoryName(path)?.Replace("\\", "/");
+        if (!string.IsNullOrEmpty(directory) && AssetDatabase.IsValidFolder(directory))
+        {
+            return directory;
+        }
+
+        return null;
+    }
+
+    private static string PromptFolderUnderAssetsArt()
+    {
+        string absolute = EditorUtility.OpenFolderPanel("Select Character Folder", Application.dataPath, "");
+        if (string.IsNullOrEmpty(absolute))
+        {
+            return null;
+        }
+
+        string normalized = absolute.Replace("\\", "/");
+        string assetsRoot = Application.dataPath.Replace("\\", "/");
+        if (!normalized.StartsWith(assetsRoot))
+        {
+            Debug.LogError("Selected folder must be inside this project's Assets folder.");
+            return null;
+        }
+
+        string relative = "Assets" + normalized.Substring(assetsRoot.Length);
+        if (!relative.StartsWith("Assets/Art/"))
+        {
+            Debug.LogError("Selected folder must be under Assets/Art.");
+            return null;
+        }
+
+        return relative;
     }
 
     private static void EnsureTextureSettings(string assetPath)
@@ -146,7 +237,17 @@ public static class CreateBottomBigEarsAnimator
         sm.anyStateTransitions = new AnimatorStateTransition[0];
         sm.entryTransitions = new AnimatorTransition[0];
 
-        if (controller.parameters.Length == 0)
+        bool hasSpeed = false;
+        foreach (AnimatorControllerParameter p in controller.parameters)
+        {
+            if (p.name == "Speed" && p.type == AnimatorControllerParameterType.Float)
+            {
+                hasSpeed = true;
+                break;
+            }
+        }
+
+        if (!hasSpeed)
         {
             controller.AddParameter("Speed", AnimatorControllerParameterType.Float);
         }
