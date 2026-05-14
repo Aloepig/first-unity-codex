@@ -7,6 +7,7 @@ namespace Script
     {
         [Header("Movement")] [SerializeField] private float moveSpeed = 6f;
         [SerializeField] private InputActionReference moveAction;
+        [SerializeField] private InputActionReference throwAction;
 
         [Header("Coin Toss Settings")] [SerializeField]
         private GameObject coinPrefab;
@@ -18,30 +19,34 @@ namespace Script
         private int coinCount = 10;
 
         private InputAction moveInput;
+        private InputAction throwInput;
         private float horizontal;
         private Rigidbody2D rb;
 
         private void Awake()
         {
             moveInput = moveAction != null ? moveAction.action : null;
+            throwInput = throwAction != null ? throwAction.action : null;
             rb = GetComponent<Rigidbody2D>();
         }
 
         private void OnEnable()
         {
             moveInput?.Enable();
+            throwInput?.Enable();
         }
 
         private void OnDisable()
         {
             moveInput?.Disable();
+            throwInput?.Disable();
         }
 
         private void Update()
         {
             horizontal = moveInput != null ? moveInput.ReadValue<Vector2>().x : 0f;
 
-            if (Keyboard.current != null && Keyboard.current.gKey.wasPressedThisFrame && coinCount > 0)
+            if (throwInput != null && throwInput.WasPressedThisFrame() && coinCount > 0)
             {
                 TossCoin();
             }
@@ -68,9 +73,10 @@ namespace Script
             coinCount--;
 
             Vector3 spawnPosition = tossPoint != null ? tossPoint.position : transform.position;
+            float lookDirection;
             if (tossPoint == null || tossPoint == transform)
             {
-                float lookDirection = transform.localScale.x >= 0f ? 1f : -1f;
+                lookDirection = transform.localScale.x >= 0f ? 1f : -1f;
                 spawnPosition += new Vector3(lookDirection * 0.8f, 0.2f, 0f);
             }
             GameObject newCoin = Instantiate(coinPrefab, spawnPosition, Quaternion.identity);
@@ -87,7 +93,7 @@ namespace Script
                 coin.InitializeAfterThrow(coinPickupDelayAfterThrow);
             }
 
-            float lookDirection = transform.localScale.x >= 0f ? 1f : -1f;
+            lookDirection = transform.localScale.x >= 0f ? 1f : -1f;
             Vector2 finalForce = new Vector2(tossForce.x * lookDirection, tossForce.y);
 
             coinRb.AddForce(finalForce, ForceMode2D.Impulse);

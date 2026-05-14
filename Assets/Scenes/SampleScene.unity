@@ -1120,10 +1120,18 @@ PrefabInstance:
       propertyPath: m_Name
       value: Player
       objectReference: {fileID: 0}
+    - target: {fileID: 5646939390454889656, guid: 0467db3d613c71e4288b6c7a81b7153a, type: 3}
+      propertyPath: m_Constraints
+      value: 4
+      objectReference: {fileID: 0}
     - target: {fileID: 6088858994765239897, guid: 0467db3d613c71e4288b6c7a81b7153a, type: 3}
       propertyPath: coinPrefab
       value: 
-      objectReference: {fileID: 0}
+      objectReference: {fileID: 2915868347997162671, guid: 88ada5b23536e7e41b4b789819f784fd, type: 3}
+    - target: {fileID: 6088858994765239897, guid: 0467db3d613c71e4288b6c7a81b7153a, type: 3}
+      propertyPath: throwAction
+      value: 
+      objectReference: {fileID: 1120369429361536294, guid: 2bcd2660ca9b64942af0de543d8d7100, type: 3}
     - target: {fileID: 8169445957427217733, guid: 0467db3d613c71e4288b6c7a81b7153a, type: 3}
       propertyPath: m_LocalPosition.x
       value: -5.196
