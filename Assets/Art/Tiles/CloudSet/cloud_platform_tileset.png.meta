@@ -138,8 +138,8 @@ TextureImporter:
       name: cloud_mid
       rect:
         serializedVersion: 2
-        x: 724
-        y: 0
+        x: 726
+        y: 2
         width: 724
         height: 472
       alignment: 0
@@ -161,7 +161,7 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 1448
-        y: 0
+        y: 2
         width: 724
         height: 472
       alignment: 0
