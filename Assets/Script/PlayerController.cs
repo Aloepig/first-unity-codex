@@ -21,13 +21,16 @@ namespace Script
         private InputAction moveInput;
         private InputAction throwInput;
         private float horizontal;
+        private float facingDirection = 1f;
         private Rigidbody2D rb;
+        private SpriteRenderer spriteRenderer;
 
         private void Awake()
         {
             moveInput = moveAction != null ? moveAction.action : null;
             throwInput = throwAction != null ? throwAction.action : null;
             rb = GetComponent<Rigidbody2D>();
+            spriteRenderer = GetComponent<SpriteRenderer>();
         }
 
         private void OnEnable()
@@ -45,10 +48,28 @@ namespace Script
         private void Update()
         {
             horizontal = moveInput != null ? moveInput.ReadValue<Vector2>().x : 0f;
+            UpdateFacingDirection();
 
             if (throwInput != null && throwInput.WasPressedThisFrame() && coinCount > 0)
             {
                 TossCoin();
+            }
+        }
+
+        private void UpdateFacingDirection()
+        {
+            if (horizontal > 0.01f)
+            {
+                facingDirection = 1f;
+            }
+            else if (horizontal < -0.01f)
+            {
+                facingDirection = -1f;
+            }
+
+            if (spriteRenderer != null)
+            {
+                spriteRenderer.flipX = facingDirection < 0f;
             }
         }
 
@@ -76,7 +97,7 @@ namespace Script
             float lookDirection;
             if (tossPoint == null || tossPoint == transform)
             {
-                lookDirection = transform.localScale.x >= 0f ? 1f : -1f;
+                lookDirection = facingDirection;
                 spawnPosition += new Vector3(lookDirection * 0.8f, 0.2f, 0f);
             }
             GameObject newCoin = Instantiate(coinPrefab, spawnPosition, Quaternion.identity);
@@ -93,7 +114,7 @@ namespace Script
                 coin.InitializeAfterThrow(coinPickupDelayAfterThrow);
             }
 
-            lookDirection = transform.localScale.x >= 0f ? 1f : -1f;
+            lookDirection = facingDirection;
             Vector2 finalForce = new Vector2(tossForce.x * lookDirection, tossForce.y);
 
             coinRb.AddForce(finalForce, ForceMode2D.Impulse);
